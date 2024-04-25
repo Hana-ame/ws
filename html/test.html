@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>坐标转换器测试</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+    #coordinates {
+      margin-top: 10px;
+      font-family: Arial, sans-serif;
+    }   
+    button {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="myCanvas" width="400" height="400"></canvas>
+  <script src="canvas2cartesian.js"></script>
+  <script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+
+    // 创建一个坐标转换器
+    const converter = createCoordinateConverter(centerX, centerY);
+    const { canvasToCartesian, cartesianToCanvas } = converter;
+
+    // 测试 canvasToCartesian 函数
+    function test(x,y) {
+      const canvasX = x;
+      const canvasY = y;
+      const { x: cartesianX, y: cartesianY } = canvasToCartesian(canvasX, canvasY);
+      console.log(`canvas坐标 (${canvasX}, ${canvasY}) 转换为平面直角坐标系中的坐标为: (${cartesianX}, ${cartesianY})`);
+
+      // 测试 cartesianToCanvas 函数
+      const cartesianX2 = cartesianX;
+      const cartesianY2 = cartesianY;
+      const { x: canvasX2, y: canvasY2 } = cartesianToCanvas(cartesianX2, cartesianY2);
+      console.log(`平面直角坐标系中的坐标 (${cartesianX2}, ${cartesianY2}) 转换为canvas坐标为: (${canvasX2}, ${canvasY2})`);
+    }
+
+    canvas.addEventListener('click', function(event) {
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+      test(x,y);
+    });
+  </script>
+</body>
+</html>

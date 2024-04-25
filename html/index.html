@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Canvas坐标系和点击示例</title>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+    #coordinates {
+      margin-top: 10px;
+      font-family: Arial, sans-serif;
+    }
+    button {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="myCanvas" width="400" height="400"></canvas>
+  <div id="coordinates"></div>
+  <div id="coordinates2"></div>
+  <button onclick="clearDots()">清除点</button>
+
+  <script src="numpy-websocket-api.js"></script>
+  <script src="canvas2cartesian.js"></script>
+  <script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const dots = [];
+    const coordinatesDiv = document.getElementById('coordinates');
+    const coordinatesDiv2 = document.getElementById('coordinates2');
+
+    // 创建坐标转换器
+    const converter = createCoordinateConverter(centerX, centerY);
+    const { canvasToCartesian, cartesianToCanvas } = converter;
+
+    // 绘制坐标轴
+    function drawAxis() {
+      ctx.beginPath();
+      ctx.moveTo(0, centerY);
+      ctx.lineTo(canvas.width, centerY);
+      ctx.moveTo(centerX, 0);
+      ctx.lineTo(centerX, canvas.height);
+      ctx.stroke();
+
+      // 绘制箭头
+      ctx.beginPath();
+      ctx.moveTo(canvas.width - 10, centerY);
+      ctx.lineTo(canvas.width, centerY);
+      ctx.lineTo(canvas.width - 10, centerY - 5);
+      ctx.moveTo(canvas.width - 10, centerY);
+      ctx.lineTo(canvas.width - 10, centerY + 5);
+      ctx.moveTo(centerX, 10);
+      ctx.lineTo(centerX, 0);
+      ctx.lineTo(centerX - 5, 10);
+      ctx.moveTo(centerX, 10);
+      ctx.lineTo(centerX + 5, 10);
+      ctx.stroke();
+
+      // 标注坐标轴
+      ctx.font = '12px Arial';
+      ctx.fillText('X', canvas.width - 15, centerY - 15);
+      ctx.fillText('Y', centerX + 15, 15);
+      ctx.fillText('O', centerX - 10, centerY + 15);
+    }
+
+    // 绘制点
+    function drawDots() {
+      ctx.fillStyle = 'black';
+      for (const dot of dots) {
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, 5, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+    }
+
+    function updateCoordinates(x, y) {
+      const { x: cartesianX, y: cartesianY } = canvasToCartesian(x, y);
+      coordinatesDiv.textContent = `点击位置坐标: (${cartesianX.toFixed(2)}, ${cartesianY.toFixed(2)})`;
+    }
+
+    function clearDots() {
+      dots.length = 0;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawAxis();
+      coordinatesDiv.textContent = '';
+      coordinatesDiv2.textContent = '';
+    }
+
+    
+    // 创建 WebSocket 连接
+    const ws = new NumpyWebSocketClient('ws://localhost:8765/a/lmul');
+
+    // 接收服务器返回的坐标数据
+    ws.onmessage((data) => {
+      const { x, y } = cartesianToCanvas(data[0], data[1]);
+      dots.push({ x, y });
+      drawDots();
+      coordinatesDiv2.textContent = `返回位置坐标: (${data[0].toFixed(2)}, ${data[1].toFixed(2)})`;
+    });
+
+
+    function init() {
+      drawAxis();
+      canvas.addEventListener('click', function(event) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        dots.push({ x, y });
+        drawDots();
+        updateCoordinates(x, y);
+
+        // 发送点的坐标到服务器
+        const { x: cartesianX, y: cartesianY } = canvasToCartesian(x, y);
+        const obj = {
+          "a" : [cartesianX,cartesianY],
+          "lmul" : [[0,1],[1,0]],
+        }
+        ws.send(obj);
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>
