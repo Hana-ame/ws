@@ -14,7 +14,7 @@ def AutoJson(func):
 def AutoTryCatch(func):
   def wrapper(s: str) -> str:
     try:
-      func(s)
+      return func(s)
     except Exception:
       print(traceback.format_stack())
       error_message = traceback.format_exc()
