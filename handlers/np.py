@@ -1,5 +1,5 @@
 import numpy as np
-
+from typing import Any
 
 def a_transpose(a: list):
   np_a = np.array(a)
@@ -15,16 +15,24 @@ def a_lmul(a: list[float], lmul: list[list[float]]):
   mul = np.dot(np_lmul, np.transpose(np_a))
   return np.transpose(mul).tolist()
 
-def a_relu(a: list[float]):
-  np_a = np.array(a)
-  return np.maximum(0, np_a)
+def relu(a: np.ndarray):
+  return np.maximum(0, a)
 
-def a_softmax(a: list[float]):
-    exp_x = np.exp(a - np.max(a, axis=-1, keepdims=True))  # 防止数值溢出
-    # print(np.max(a, axis=-1, keepdims=True))
-    # print(exp_x)
-    # print(a - np.max(a, axis=-1, keepdims=True))
-    return exp_x / np.sum(exp_x, axis=-1, keepdims=True)
+def softmax(a: np.ndarray):
+  exp_x = np.exp(a - np.max(a, axis=-1, keepdims=True))  # 防止数值溢出
+  # print(np.max(a, axis=-1, keepdims=True))
+  # print(exp_x)
+  # print(a - np.max(a, axis=-1, keepdims=True))
+  return exp_x / np.sum(exp_x, axis=-1, keepdims=True)
+
+def a_my(a :list[float]):
+  np_a = np.array(a)
+  np_lmul = np.array([[0,1],[3,0]])
+  mul = np.dot(np_lmul, np.transpose(np_a))
+
+def a_rand(*a :float):
+  args = [int(x) for x in a]  
+  return np.random.rand(*args)
 
 if __name__ == '__main__':
   a = np.array([1,2])
@@ -51,9 +59,14 @@ if __name__ == '__main__':
   print("Input:")
   print(x)
   print("\nSoftmax Output:")
-  print(a_softmax(x))
+  print(softmax(x))
   # [[0.09003057 0.24472847 0.66524096]
   #  [0.09003057 0.24472847 0.66524096]]
+
+  print("...")
+
+  print(a_rand(*[2,3,4]))
+
 
 
 
