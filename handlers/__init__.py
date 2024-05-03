@@ -1,5 +1,5 @@
 from typing import Callable
-from .decorator import AutoJson
+from .decorator import AutoJson, AutoTryCatch
 
 handlers:dict[str, Callable[[str], str]] = {}
 
@@ -19,4 +19,4 @@ handlers["/echo"] = echo
 # handlers["/a/my"] = AutoJson(a_my)
 
 from .groq_api import api
-handlers["/groq"] = api
+handlers["/groq"] = AutoTryCatch(api)
