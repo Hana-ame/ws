@@ -30,4 +30,7 @@ def api(data: str) -> str:
   return completion.choices[0].message.content
 
 if __name__ == "__main__":
-  print(api('为啥不行'))
+  print(api('bangdream 是什么'))
+  print(api('为什么要演奏春日影'))
+  print(api('我是谁'))
+  print(api('你是谁'))
