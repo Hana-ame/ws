@@ -15,7 +15,8 @@ def AutoTryCatch(func):
   def wrapper(s: str) -> str:
     try:
       func(s)
-    except Exception:      
+    except Exception:
+      print(traceback.format_stack())
       error_message = traceback.format_exc()
       return str(error_message)
   return wrapper
