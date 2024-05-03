@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Example</title>
+    <style>
+      #output div {
+          background-color: #f5f5f5;
+          padding: 10px;
+          margin-bottom: 10px;
+          border-radius: 5px;
+      }
+
+      #output div pre {
+          background-color: #e5e5e5;
+          padding: 10px;
+          overflow-x: auto;
+      }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/2.1.0/showdown.min.js"></script>
+  </head>
+<body style="max-width: 420px;">
+    <textarea id="chatInput" rows="5" placeholder="Enter your message here..."></textarea><br>
+    <button id="sendMessage">Submit</button>
+    <div id="output"></div>
+    
+    <script defer>
+      window.onload = function() {
+
+        console.log(showdown)
+
+        const WS_SERVER = "ws://localhost:8765/groq"
+
+        // WebSocket连接
+        const socket = new WebSocket(WS_SERVER);
+
+        // 建立连接后的回调函数
+        socket.onopen = function(e) {
+            console.log('WebSocket connection established.');
+        };
+
+        // 创建showdown实例
+
+        // 接收服务器数据后的回调函数
+        socket.onmessage = function(event) {
+            const converter = new showdown.Converter();
+
+            const serverResponse = event.data;
+            const html = converter.makeHtml(serverResponse); // 将Markdown转换为HTML
+
+            const outputDiv = document.getElementById('output');
+            const responseElement = document.createElement('div');
+            responseElement.innerHTML = html; // 设置innerHTML以渲染HTML
+            // 将新元素插入到outputDiv的开头
+            outputDiv.insertAdjacentElement('afterbegin', responseElement);
+
+        };
+
+        // 发送消息到服务器
+        function sendMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value;
+            socket.send(message);
+            // chatInput.value = ''; // 清空输入框
+        }
+        const sendButton = document.getElementById('sendMessage');
+        sendButton.onclick = sendMessage
+        const chatInput = document.getElementById('chatInput');
+        chatInput.addEventListener('keydown', function(event) {
+          if (event.ctrlKey && event.keyCode === 13) {
+            // 发生了 Ctrl + Enter 事件，执行相应的操作
+            console.log('Ctrl + Enter pressed!');
+
+            sendMessage();
+          }
+        });
+
+
+      } // window.onload
+    </script>
+</body>
+</html>

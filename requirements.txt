@@ -1,0 +1,5 @@
+colorama>=0.4.6
+json5>=0.9.25
+python-dotenv>=1.0.1
+groq>=0.5.0
+websockets>=12.0
