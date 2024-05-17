@@ -19,4 +19,4 @@ handlers["/echo"] = echo
 # handlers["/a/my"] = AutoJson(a_my)
 
 from .groq_api import api
-handlers["/groq"] = AutoTryCatch(api)
+handlers["/groq"] = AutoJson(api)

@@ -9,14 +9,15 @@ system_prompt = os.getenv("SYSTEM_PROMPT")
 print(system_prompt)
 
 
-def api(data: str) -> str:
-  content = data
+def api(prompt:str="", content: str="") -> str:
+  if prompt == "":
+    prompt = system_prompt
   completion = client.chat.completions.create(
     model="llama3-8b-8192",
     messages=[
       {
         "role": "system",
-        "content": system_prompt,
+        "content": prompt,
       },
       {"role": "user", "content": content},
     ],
