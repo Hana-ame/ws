@@ -28,7 +28,7 @@ def api(prompt:str="", content: str="") -> str:
     stop=None,
   )
 
-  return completion.choices[0].message.content
+  return completion.choices[0].message.content, True
 
 if __name__ == "__main__":
   print(api('bangdream 是什么'))

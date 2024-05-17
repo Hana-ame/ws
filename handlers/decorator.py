@@ -6,8 +6,10 @@ def AutoJson(func):
   def wrapper(s: str) -> str:
     kwargs = json5.loads(s)
 
-    result = func(**kwargs)
-
+    result, direct = func(**kwargs)
+    
+    if direct:
+      return result
     return str(json5.dumps(result))
   return wrapper
 
